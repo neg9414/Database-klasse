@@ -14,10 +14,7 @@ class Database:
 
     # Min create til at lave en nu række
     def save(self, artwork: Artwork):
-        self.cursor.execute(
-            "INSERT INTO artworks (title, artist, year) VALUES (?, ?, ?)",
-            (artwork.title, artwork.artist, artwork.year)
-        )
+        self.cursor.execute("INSERT INTO artworks (title, artist, year) VALUES (?, ?, ?)", (artwork.title, artwork.artist, artwork.year))
         self.conn.commit()
         return self.cursor.lastrowid
 
