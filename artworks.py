@@ -1,5 +1,3 @@
-import random
-
 class Artwork:
     def __init__(self, id=None, title=None, artist=None, year=None):
         self.id = id
