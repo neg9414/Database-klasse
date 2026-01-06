@@ -1,58 +1,41 @@
 import sqlite3
+from artworks import Artwork
 
-DB_FILE = "artworks.db"
 
 class Database:
-    def __init__(self):
-        self._create_table()
+    def __init__(self, db_name="artworks.db"):
+        self.conn = sqlite3.connect(db_name)
+        self.cursor = self.conn.cursor()
+        self.create_table()
 
-    def _connect(self):
-        conn = sqlite3.connect(DB_FILE)
-        conn.row_factory = sqlite3.Row
-        return conn
+    def create_table(self):
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS artworks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, artist TEXT, year INTEGER)""")
+        self.conn.commit()
 
-    def _execute(self, query, params=()):
-        conn = self._connect()
-        try:
-            conn.execute(query, params)
-            conn.commit()
-        finally:
-            conn.close()
+    # Min create til at lave en nu række
+    def save(self, artwork: Artwork):
+        self.cursor.execute(
+            "INSERT INTO artworks (title, artist, year) VALUES (?, ?, ?)",
+            (artwork.title, artwork.artist, artwork.year)
+        )
+        self.conn.commit()
+        return self.cursor.lastrowid
 
-    def _run_query(self, query, params=()):
-        conn = self._connect()
-        try:
-            cur = conn.execute(query, params)
-            rows = cur.fetchall()
-        finally:
-            conn.close()
-        return {"rows": [dict(row) for row in rows]}
-    
-    
-    def _create_table(self):
-        query = """CREATE TABLE IF NOT EXISTS artworks ( id INTEGER PRIMARY KEY, artist TEXT NOT NULL, painting TEXT NOT NULL, year INTEGER, genre TEXT, image TEXT, beskrivelse TEXT )"""
-        self._execute(query)
+    # Her kan jeg hente og læse information fra et maleri
+    def load(self, id):
+        self.cursor.execute("SELECT * FROM artworks WHERE id = ?", (id,))
+        row = self.cursor.fetchone()
+        if row:
+            return Artwork(row[0], row[1], row[2], row[3])
+        return None
 
-    def search(self, term):
-        query = """SELECT * FROM artworks WHERE artist LIKE ? OR painting LIKE ? OR genre LIKE ?"""
-        return self._run_query(query, (f"%{term}%", f"%{term}%", f"%{term}%"))
-
-    def load(self, artwork_id):
-        query = "SELECT * FROM artworks WHERE id = ?"
-        return self._run_query(query, (artwork_id,))
-
+    # Henter alle mine rækker
     def load_all(self):
-        query = "SELECT * FROM artworks"
-        return self._run_query(query)
+        self.cursor.execute("SELECT * FROM artworks")
+        rows = self.cursor.fetchall()
+        return [Artwork(r[0], r[1], r[2], r[3]) for r in rows]
 
-    def insert(self, id, artist, painting, year, genre, image, beskrivelse):
-        query = """INSERT INTO artworks (id, artist, painting, year, genre, image, beskrivelse) VALUES (?, ?, ?, ?, ?, ?, ?) """
-        self._execute(query, (id, artist, painting, year, genre, image, beskrivelse))
-
-    def deleted (self):
-        query = "DELETED * FROM artworks WHERE id = ?" 
-        return self._run_query(query)
-
-    def update (self):
-        query = "UPDATE * FROM artworks (id, artist, painting, year, genre, image, beskrivelse) VALUES (?, ?, ?, ?, ?, ?, ?) """
-        return self._run_query(query)
+    # Sletter en række 
+    def delete(self, id):
+        self.cursor.execute("DELETE FROM artworks WHERE id = ?", (id,))
+        self.conn.commit()
