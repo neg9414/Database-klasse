@@ -50,4 +50,9 @@ class Database:
         self._execute(query, (id, artist, painting, year, genre, image, beskrivelse))
 
     def deleted (self):
-        query = "SELECT * FROM artworks" 
+        query = "DELETED * FROM artworks WHERE id = ?" 
+        return self._run_query(query)
+
+    def update (self):
+        query = "UPDATE * FROM artworks (id, artist, painting, year, genre, image, beskrivelse) VALUES (?, ?, ?, ?, ?, ?, ?) """
+        return self._run_query(query)

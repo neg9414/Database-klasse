@@ -18,7 +18,7 @@ db.insert(
 )
 
 # Henter et bestemt maleri
-print(db.load(78))
-# hej
+print(db.load())
+
 # Vis alle malerier
-#print(db.load_all()) 
+print(db.load_all()) 
