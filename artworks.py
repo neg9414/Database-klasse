@@ -1,12 +1,11 @@
 import random
 
-class artworks:
-    def __init__ (self, artist: str, painting: str, year: int, genre: str, beskrivelse: str):
+class Artwork:
+    def __init__(self, id=None, title=None, artist=None, year=None):
+        self.id = id
+        self.title = title
         self.artist = artist
-        self.painting = painting
         self.year = year
-        self.genre = genre
-        self.beskrivelse = beskrivelse
 
-    def __str__ (self):
-        return f' artist: {self.artist} har lavet {self.painting} som har genren {self.genre} i {self.year}. {self.beskrivelse}'
+    def __str__(self):
+        return f"{self.id}: {self.title} af {self.artist} i ({self.year})"
